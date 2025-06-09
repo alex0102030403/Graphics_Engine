@@ -50,12 +50,9 @@ public:
 
 	Model(const std::string& filename, Grid* parentGrid = nullptr);
 
-	void Update() override {}
 	void Render(const Shader& shader) override;
 	void SetColor(const glm::vec4& color) override;
 
-	glm::vec3 GetBoundingSphereCenter() const override { return glm::vec3(0.0f); } // Placeholder
-	float GetBoundingSphereRadius() const override { return 1.0f; } // Placeholder
 
 private:
 

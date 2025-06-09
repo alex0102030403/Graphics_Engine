@@ -17,15 +17,12 @@ public:
     Transform& GetTransform();
     const glm::vec4& GetColor() const;
 
-    virtual void Update() = 0;
     virtual void Render(const Shader& shader);
     virtual void SetColor(const glm::vec4& color) = 0;
 
     // New methods for picking
-    virtual glm::vec3 GetBoundingSphereCenter() const = 0;
-    virtual float GetBoundingSphereRadius() const = 0;
     virtual bool IntersectsRay(const Utility::Ray& ray, float& t) = 0;
-	virtual void RenderAABBEdges(const Shader& shader) {}
+    virtual void RenderAABBEdges(const Shader& shader) = 0;
 
 protected:
     bool m_isTextured;

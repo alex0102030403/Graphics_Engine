@@ -16,7 +16,6 @@ public:
 
 	void SetColor(const glm::vec4& color) override;
 
-	void Update() override {}
 	void Render(const Shader& shader) override;
 
 private:

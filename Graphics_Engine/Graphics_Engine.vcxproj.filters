@@ -46,6 +46,12 @@
     <Filter Include="Source Files\imgui">
       <UniqueIdentifier>{92dbffba-8851-4299-8843-b66825eb1141}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Physics">
+      <UniqueIdentifier>{949279a3-6af5-4251-a273-cf513a98d55d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Physics">
+      <UniqueIdentifier>{3ae523ee-afa8-40d2-8942-b4ef7bb2e4db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Shader.cpp">
@@ -120,6 +126,15 @@
     <ClCompile Include="imgui\imgui_impl_sdl.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="BoxCollider.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Contact.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="RigidBody.cpp">
+      <Filter>Source Files\Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -190,6 +205,21 @@
     </ClInclude>
     <ClInclude Include="imgui\imgui_impl_sdl.h">
       <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidBody.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetector.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="ContactResolver.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsWorld.h">
+      <Filter>Header Files\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
