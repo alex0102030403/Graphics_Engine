@@ -52,6 +52,12 @@
     <Filter Include="Header Files\Physics">
       <UniqueIdentifier>{3ae523ee-afa8-40d2-8942-b4ef7bb2e4db}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Particles">
+      <UniqueIdentifier>{166b2c93-4582-44fc-a1f2-c8528ea8cd6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Particles">
+      <UniqueIdentifier>{ea5c1631-c7d0-4e2c-b6ba-20df9993b089}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Shader.cpp">
@@ -134,6 +140,9 @@
     </ClCompile>
     <ClCompile Include="RigidBody.cpp">
       <Filter>Source Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
+      <Filter>Source Files\Particles</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -221,6 +230,9 @@
     <ClInclude Include="PhysicsWorld.h">
       <Filter>Header Files\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleSystem.h">
+      <Filter>Header Files\Particles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Default.frag">
@@ -233,6 +245,15 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\Light.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Particle.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Particle.geom">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Particle.frag">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

@@ -44,6 +44,33 @@ GLuint Shader::GetShaderProgramID() const
 	return m_shaderProgramID;
 }
 
+bool Shader::Create(const std::string& vertexShaderFilename, const std::string& fragmentShaderFilename, const std::string& geometryShaderFilename)
+{
+	m_shaderProgramID = glCreateProgram();
+	if (m_shaderProgramID == 0)
+	{
+		std::cout << "Error creating shader program." << std::endl;
+		return false;
+	}
+	if (!CompileShaders(vertexShaderFilename, ShaderType::VertexShader))
+	{
+		return false;
+	}
+	if (!CompileShaders(fragmentShaderFilename, ShaderType::FragmentShader))
+	{
+		return false;
+	}
+	if (!CompileShaders(geometryShaderFilename, ShaderType::GeometryShader))
+	{
+		return false;
+	}
+	if (!LinkProgram())
+	{
+		return false;
+	}
+	return true;
+}
+
 bool Shader::Create(const std::string& vertexShaderFilename, const std::string& fragmentShaderFilename)
 {
 	m_shaderProgramID = glCreateProgram();

@@ -54,3 +54,24 @@ void Texture::Unload() const
 {
 	glDeleteTextures(1, &m_ID);
 }
+
+void Texture::LoadToTarget(GLuint textureID, GLenum target, const std::string& filename) {
+	SDL_Surface* textureData = IMG_Load(filename.c_str());
+
+	if (!textureData) {
+		Utility::AddMessage("Error loading texture: " + filename);
+		return;
+	}
+
+	auto width = textureData->w;
+	auto height = textureData->h;
+	auto* pixels = (Uint8*)textureData->pixels;
+	auto depth = textureData->format->BytesPerPixel;
+	auto format = (depth == 4) ? GL_RGBA : GL_RGB;
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+	glTexImage2D(target, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+	SDL_FreeSurface(textureData);
+}

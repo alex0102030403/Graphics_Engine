@@ -9,6 +9,7 @@ public:
         std::vector<Contact> contacts;
         for (size_t i = 0; i < bodies.size(); ++i) {
             for (size_t j = i + 1; j < bodies.size(); ++j) {
+                //check if is trigger
                 RigidBody* bodyA = bodies[i];
                 RigidBody* bodyB = bodies[j];
                 BoxCollider* colliderA = dynamic_cast<BoxCollider*>(bodyA->collider);

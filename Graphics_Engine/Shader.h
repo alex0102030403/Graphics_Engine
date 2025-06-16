@@ -12,7 +12,8 @@ public:
 	enum class ShaderType 
 	{ 
 		VertexShader,
-		FragmentShader
+		FragmentShader,
+		GeometryShader,
 	};
 
 	static bool Initialize();
@@ -25,6 +26,10 @@ public:
 
 	bool Create(const std::string& vertexShaderFilename, 
 		const std::string& fragmentShaderFilename);
+
+	bool Create(const std::string& vertexShaderFilename,
+		const std::string& fragmentShaderFilename,
+		const std::string& geometryShaderFilename);
 
 	bool SendData(const std::string& uniformName, GLint data) const;
 	bool SendData(const std::string& uniformName, GLuint data) const;

@@ -8,7 +8,13 @@ public:
     void resolveContacts(std::vector<Contact>& contacts, float dt) {
         for (int i = 0; i < 20; ++i) { // Increased to 20 iterations
             for (auto& contact : contacts) {
-                resolveContact(contact, dt);
+				//check for triggers
+				if (contact.bodyA->collider->isTrigger || contact.bodyB->collider->isTrigger) {
+					continue; // Skip triggers
+                }
+                else {
+                    resolveContact(contact, dt);
+                }
             }
         }
     }

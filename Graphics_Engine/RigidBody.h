@@ -6,12 +6,15 @@
 #include <vector> // This might not be strictly needed in the header if not directly used in the public interface or member variables exposed.
 #include <cmath>  // This might not be strictly needed in the header.
 
+#include <string> // For the name of the RigidBody
+
 // Forward declaration of Collider class if it's defined elsewhere.
 // If Collider is a simple struct or part of this library, you might include its header here.
 class Collider;
 
 class RigidBody {
 public:
+    std::string name;
     // Member variables
     glm::vec3 position;
     glm::quat orientation;

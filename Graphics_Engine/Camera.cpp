@@ -73,6 +73,15 @@ void Camera::MoveRight(float deltaTime) {
 	m_transform.SetPosition(position.x, position.y, position.z);
 }
 
+void Camera::LookAt(const glm::vec3& target)
+{
+	glm::vec3 position = m_transform.GetPosition();
+	m_view = glm::lookAt(position, target, m_up);
+	m_direction = glm::normalize(target - position);
+	m_pitch = asin(m_direction.y);
+	m_yaw = atan2(-m_direction.x, -m_direction.z);
+}
+
 void Camera::UpdateDirection()
 {
 	m_direction.x = -sin(m_yaw) * cos(m_pitch);

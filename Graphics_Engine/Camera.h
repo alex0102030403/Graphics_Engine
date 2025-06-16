@@ -23,6 +23,9 @@ public:
 	void MoveBackward(float deltaTime);
 	void MoveLeft(float deltaTime);
 	void MoveRight(float deltaTime);
+	void LookAt(const glm::vec3& target);
+
+	Transform& GetTransform() { return m_transform; }
 	
 	void Update() {}
 	void SendToShader(const Shader& shader);

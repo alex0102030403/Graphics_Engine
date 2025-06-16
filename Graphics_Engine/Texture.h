@@ -15,6 +15,8 @@ public:
 	void Unbind() const;
 	void Unload() const;
 
+	static void LoadToTarget(GLuint textureID, GLenum target, const std::string& filename);
+
 private:
 
 	GLuint m_ID;
