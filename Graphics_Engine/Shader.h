@@ -24,12 +24,9 @@ public:
 
 	GLuint GetShaderProgramID() const;
 
-	bool Create(const std::string& vertexShaderFilename, 
-		const std::string& fragmentShaderFilename);
-
 	bool Create(const std::string& vertexShaderFilename,
 		const std::string& fragmentShaderFilename,
-		const std::string& geometryShaderFilename);
+		const std::string& geometryShaderFilename = "");
 
 	bool SendData(const std::string& uniformName, GLint data) const;
 	bool SendData(const std::string& uniformName, GLuint data) const;
@@ -47,11 +44,13 @@ public:
 
 private:
 
-	bool LinkProgram();
+	bool LinkProgram(bool withGeometryShader);
 	bool CompileShaders(const std::string& filename, ShaderType shaderType);
 	
 	GLuint m_shaderProgramID;
 	static GLuint s_vertexShaderID;
 	static GLuint s_fragmentShaderID;
+	static GLuint s_geometryShaderID;
+
 
 };

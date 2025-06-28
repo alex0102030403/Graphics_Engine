@@ -31,12 +31,12 @@ const glm::vec4& Object::GetColor() const
 void Object::Render(const Shader& shader)
 {
 	m_normal = glm::inverse(glm::mat3(m_transform.GetMatrix()));
-	
+
 	if (m_parentGrid)
 	{
 		shader.SendData("model", m_parentGrid->GetTransform().GetMatrix() * m_transform.GetMatrix());
 	}
-	
+
 	else
 	{
 		shader.SendData("model", m_transform.GetMatrix());

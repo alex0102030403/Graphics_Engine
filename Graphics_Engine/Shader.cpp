@@ -6,6 +6,7 @@
 
 GLuint Shader::s_vertexShaderID = 0;
 GLuint Shader::s_fragmentShaderID = 0;
+GLuint Shader::s_geometryShaderID = 0;
 
 bool Shader::Initialize()
 {
@@ -25,6 +26,14 @@ bool Shader::Initialize()
 		return false;
 	}
 
+	s_geometryShaderID = glCreateShader(GL_GEOMETRY_SHADER);
+
+	if (s_geometryShaderID == 0)
+	{
+		std::cout << "Error creating geometry shader object." << std::endl;
+		return false;
+	}
+
 	return true;
 }
 
@@ -32,12 +41,14 @@ void Shader::Shutdown()
 {
 	glDeleteShader(s_vertexShaderID);
 	glDeleteShader(s_fragmentShaderID);
+	glDeleteShader(s_geometryShaderID);
 }
 
 Shader::Shader()
 {
 	m_shaderProgramID = 0;
 }
+
 
 GLuint Shader::GetShaderProgramID() const
 {
@@ -46,6 +57,8 @@ GLuint Shader::GetShaderProgramID() const
 
 bool Shader::Create(const std::string& vertexShaderFilename, const std::string& fragmentShaderFilename, const std::string& geometryShaderFilename)
 {
+	bool withGeometry = false;
+	std::cout << "ASDFASDF";
 	m_shaderProgramID = glCreateProgram();
 	if (m_shaderProgramID == 0)
 	{
@@ -60,46 +73,21 @@ bool Shader::Create(const std::string& vertexShaderFilename, const std::string& 
 	{
 		return false;
 	}
-	if (!CompileShaders(geometryShaderFilename, ShaderType::GeometryShader))
-	{
-		return false;
+	if (!geometryShaderFilename.empty()) {
+		withGeometry = true;
+		if (!CompileShaders(geometryShaderFilename, ShaderType::GeometryShader))
+		{
+			return false;
+		}
 	}
-	if (!LinkProgram())
+
+	if (!LinkProgram(withGeometry))
 	{
 		return false;
 	}
 	return true;
 }
 
-bool Shader::Create(const std::string& vertexShaderFilename, const std::string& fragmentShaderFilename)
-{
-	m_shaderProgramID = glCreateProgram();
-
-	if (m_shaderProgramID == 0)
-	{
-		std::cout << "Error creating shader program." << std::endl;
-		return false;
-	}
-
-
-
-	if (!CompileShaders(vertexShaderFilename, ShaderType::VertexShader))
-	{
-		return false;
-	}
-
-	if (!CompileShaders(fragmentShaderFilename, ShaderType::FragmentShader))
-	{
-		return false;
-	}
-
-	if (!LinkProgram())
-	{
-		return false;
-	}
-
-	return true;
-}
 
 bool Shader::SendData(const std::string& uniformName, GLint data) const
 {
@@ -107,6 +95,7 @@ bool Shader::SendData(const std::string& uniformName, GLint data) const
 
 	if (ID == -1)
 	{
+		//Utility::AddMessage("Uniform not found: " + uniformName);
 		//std::cout << "Shader variable " << uniformName << " not found or not used." << std::endl;
 		return false;
 	}
@@ -223,32 +212,33 @@ void Shader::Destroy()
 	glDeleteProgram(m_shaderProgramID);
 }
 
-bool Shader::LinkProgram()
-{
+bool Shader::LinkProgram(bool withGeometryShader) {
 	glAttachShader(m_shaderProgramID, s_vertexShaderID);
 	glAttachShader(m_shaderProgramID, s_fragmentShaderID);
+	if (withGeometryShader) {
+		glAttachShader(m_shaderProgramID, s_geometryShaderID);
+		Utility::AddMessage("Geometry shader attached successfully.");
+	}
+
+	std::cout << "Attached geometry shader ID: " << s_geometryShaderID << "\n";
+	std::cout << "Attached vertex shader ID: " << s_vertexShaderID << "\n";
+	std::cout << "Attached fragment shader ID: " << s_fragmentShaderID << "\n";
+
 	glLinkProgram(m_shaderProgramID);
-	glDetachShader(m_shaderProgramID, s_vertexShaderID);
-	glDetachShader(m_shaderProgramID, s_fragmentShaderID);
 
 	GLint errorCode;
 	glGetProgramiv(m_shaderProgramID, GL_LINK_STATUS, &errorCode);
-
-	if (errorCode == GL_TRUE)
-	{
+	if (errorCode == GL_TRUE) {
 		Utility::AddMessage("Shader linking successful!");
 	}
-
-	else
-	{
-		GLchar errorMessage[1000];
-		auto bufferSize = 1000;
-
-		glGetProgramInfoLog(m_shaderProgramID, bufferSize, &bufferSize, errorMessage);
-		Utility::AddMessage(errorMessage);
+	else {
+		GLchar errorMessage[1024]; // Increase buffer size
+		GLsizei length;
+		glGetProgramInfoLog(m_shaderProgramID, 1024, &length, errorMessage);
+		Utility::AddMessage(std::string(errorMessage, length));
+		std::cout << "Shader linking failed: " << std::string(errorMessage, length) << std::endl;
 		return false;
 	}
-
 	return true;
 }
 
@@ -257,10 +247,15 @@ bool Shader::CompileShaders(const std::string& filename, ShaderType shaderType)
 	std::fstream file;
 	std::string text;
 	std::string sourceCode;
-	auto shaderID = (shaderType == ShaderType::VertexShader) ? s_vertexShaderID : s_fragmentShaderID;
+
+	auto shaderID = [shaderType]() -> GLuint {
+		if (shaderType == ShaderType::VertexShader) return s_vertexShaderID;
+		else if (shaderType == ShaderType::FragmentShader) return s_fragmentShaderID;
+		else if (shaderType == ShaderType::GeometryShader) return s_geometryShaderID;
+		return 0;
+		}();
 
 	file.open(filename);
-
 	if (!file)
 	{
 		Utility::AddMessage("Error reading shader file: " + filename);
@@ -275,6 +270,7 @@ bool Shader::CompileShaders(const std::string& filename, ShaderType shaderType)
 
 	file.close();
 
+
 	auto finalSourceCode = reinterpret_cast<const GLchar*>(sourceCode.c_str());
 	glShaderSource(shaderID, 1, &finalSourceCode, nullptr);
 
@@ -282,6 +278,8 @@ bool Shader::CompileShaders(const std::string& filename, ShaderType shaderType)
 
 	GLint errorCode;
 	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &errorCode);
+
+
 
 	if (errorCode == GL_TRUE)
 	{
@@ -295,6 +293,7 @@ bool Shader::CompileShaders(const std::string& filename, ShaderType shaderType)
 
 		glGetShaderInfoLog(shaderID, bufferSize, &bufferSize, errorMessage);
 		Utility::AddMessage(errorMessage);
+		std::cout << "Shader compilation failed: " << errorMessage << std::endl;
 		return false;
 	}
 

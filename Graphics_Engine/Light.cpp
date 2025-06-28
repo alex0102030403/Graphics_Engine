@@ -94,3 +94,23 @@ void Light::SendToShader(const Shader& shader)
 	shader.SendData("light.diffuse", m_diffuse.r, m_diffuse.g, m_diffuse.b);
 	shader.SendData("light.specular", m_specular.r, m_specular.g, m_specular.b);
 }
+
+void Light::SetAmbient(const glm::vec3& ambient)
+{
+	m_ambient = ambient;
+}
+
+void Light::SetDiffuse(const glm::vec3& diffuse)
+{
+	m_diffuse = diffuse;
+}
+
+void Light::SetSpecular(const glm::vec3& specular)
+{
+	m_specular = specular;
+}
+
+void Light::SetPosition(const glm::vec3& position)
+{
+	m_transform.SetPosition(position.x, position.y, position.z);
+}

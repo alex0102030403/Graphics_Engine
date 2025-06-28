@@ -18,6 +18,7 @@ public:
                 if (checkAABBOverlap(bodyA, colliderA, bodyB, colliderB)) {
                     Contact contact;
                     if (detectOBBCollision(bodyA, colliderA, bodyB, colliderB, contact)) {
+						//Add feature for checking name_A - name_B collisions
                         contacts.push_back(contact);
                     }
                 }

@@ -11,6 +11,7 @@ public:
     ContactResolver* contactResolver;
     glm::vec3 gravity;
     float fixedDt;
+    std::vector<Contact> lastContacts; // Added to store contacts
 
     PhysicsWorld() : gravity(glm::vec3(0, -9.81f, 0)), fixedDt(1.0f / 60.0f) {
         collisionDetector = new CollisionDetector();
@@ -33,8 +34,8 @@ public:
                     body->addForce(gravity * (1.0f / body->inverseMass));
                 }
             }
-            std::vector<Contact> contacts = collisionDetector->detectCollisions(bodies);
-            contactResolver->resolveContacts(contacts, fixedDt);
+            lastContacts = collisionDetector->detectCollisions(bodies); // Store contacts
+            contactResolver->resolveContacts(lastContacts, fixedDt);
             for (auto body : bodies) {
                 body->integrate(fixedDt);
             }

@@ -25,7 +25,17 @@ public:
 	void MoveRight(float deltaTime);
 	void LookAt(const glm::vec3& target);
 
+	glm::vec3 GetForwardVector() const { return m_direction; }
+	glm::vec3 GetRightVector() const { return glm::normalize(glm::cross(m_direction, m_up)); }
+	glm::vec3 GetUpVector() const { return m_up; }
+	glm::vec3 GetPosition() const { return m_transform.GetPosition(); }
+
 	Transform& GetTransform() { return m_transform; }
+
+	void SetYaw(GLfloat yaw) { m_yaw = yaw; }
+	void SetPitch(GLfloat pitch) { m_pitch = pitch; }
+	GLfloat GetYaw() const { return m_yaw; }
+	GLfloat GetPitch() const { return m_pitch; }
 	
 	void Update() {}
 	void SendToShader(const Shader& shader);

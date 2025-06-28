@@ -2,22 +2,29 @@
 
 #include <vector>
 #include <string>
-#include "gl.h"
-#include "Shader.h"
-#include <glm.hpp>
-#include "Camera.h"
+#include <SDL_image.h>
 
-class Skybox {
+#include <glm.hpp>
+#include <gtc\matrix_transform.hpp>
+#include <gtc\type_ptr.hpp>
+
+#include "Shader.h"  // Your new Shader class
+
+class Skybox
+{
 public:
-    Skybox(const std::vector<std::string>& faces);
+    Skybox();
+    Skybox(std::vector<std::string> faceLocations, Shader* shader);
+    void DrawSkybox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix);
     ~Skybox();
 
-    void Render(Shader& shader, const Camera& camera);
-
 private:
-    GLuint VAO;        // Vertex Array Object
-    GLuint VBO;        // Vertex Buffer Object
-    GLuint textureID;  // Cube map texture ID
+    void CreateSkyboxMesh();
+    void RenderSkyboxMesh();
 
-    void SetupSkybox(const std::vector<std::string>& faces);
+    GLuint VAO, VBO, IBO;
+    GLsizei indexCount;
+
+    Shader* skyShader;  // Pointer to your Shader class
+    GLuint textureId;
 };

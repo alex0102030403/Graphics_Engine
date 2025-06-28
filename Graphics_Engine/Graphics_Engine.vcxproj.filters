@@ -144,6 +144,9 @@
     <ClCompile Include="ParticleSystem.cpp">
       <Filter>Source Files\Particles</Filter>
     </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -233,6 +236,9 @@
     <ClInclude Include="ParticleSystem.h">
       <Filter>Header Files\Particles</Filter>
     </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Default.frag">
@@ -254,6 +260,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Particle.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Skybox.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Skybox.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

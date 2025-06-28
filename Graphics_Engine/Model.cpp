@@ -4,145 +4,164 @@
 #include "Model.h"
 #include "Input.h"
 #include "Utility.h"
+#include <array>
+#include <string>
 
 Model::Model(const std::string& filename, Grid* parentGrid) : Object(parentGrid)
 {
-	m_meshes.reserve(10);
-	m_buffers.reserve(10);
+    m_meshes.reserve(20);
+    m_buffers.reserve(20);
 
-	std::fstream file(filename, std::ios_base::in);
+    std::fstream file(filename, std::ios_base::in);
 
-	if (!file)
-	{
-		Utility::AddMessage("Error loading model file.");
-	}
+    if (!file)
+    {
+        Utility::AddMessage("Error loading model file.");
+    }
 
-	Mesh rawMesh;
-	std::string lastMaterialName;
-
+    Mesh rawMesh;
 	std::string line;
-	std::string lastName;
-	std::vector<Face> faces;
+    std::string lastMaterialName;
+    std::string currentMaterialName; // Track the current material
+    std::string lastName;
+    std::vector<Face> faces;
 
-	std::vector<std::string> subStrings;
-	subStrings.reserve(10);
+    std::vector<std::string> subStrings;
+    subStrings.reserve(20);
 
-	while (!file.eof())
-	{
-		std::getline(file, line);
-		subStrings.clear();
+    while (!file.eof())
+    {
+        std::getline(file, line);
+        subStrings.clear();
 
-		if (!line.empty() && line[0] != '#')
-		{
-			Utility::ParseString(line, subStrings, ' ');
+        if (!line.empty() && line[0] != '#')
+        {
+            Utility::ParseString(line, subStrings, ' ');
 
-			//Vertex data
-			if (subStrings[0] == "v")
-			{
-				rawMesh.vertices.push_back(glm::vec3(std::stof(subStrings[1]),
-					std::stof(subStrings[2]),
-					std::stof(subStrings[3])));
-				continue;
-			}
+            // Vertex data
+            if (subStrings[0] == "v")
+            {
+                rawMesh.vertices.push_back(glm::vec3(std::stof(subStrings[1]),
+                    std::stof(subStrings[2]),
+                    std::stof(subStrings[3])));
+                continue;
+            }
 
-			//Normal data
-			if (subStrings[0] == "vn")
-			{
-				rawMesh.normals.push_back(glm::vec3(std::stof(subStrings[1]),
-					std::stof(subStrings[2]),
-					std::stof(subStrings[3])));
-				continue;
-			}
+            // Normal data
+            if (subStrings[0] == "vn")
+            {
+                rawMesh.normals.push_back(glm::vec3(std::stof(subStrings[1]),
+                    std::stof(subStrings[2]),
+                    std::stof(subStrings[3])));
+                continue;
+            }
 
-			//Texture coordinate data
-			if (subStrings[0] == "vt")
-			{
-				rawMesh.textureCoords.push_back(glm::vec2(std::stof(subStrings[1]),
-					std::stof(subStrings[2])));
-				continue;
-			}
+            // Texture coordinate data
+            if (subStrings[0] == "vt")
+            {
+                rawMesh.textureCoords.push_back(glm::vec2(std::stof(subStrings[1]),
+                    std::stof(subStrings[2])));
+                continue;
+            }
 
-			//Faces
-			if (subStrings[0] == "f")
-			{
-				Face face;
-				std::vector<std::string> numbers;
-				numbers.reserve(10);
+            // Faces
+            if (subStrings[0] == "f")
+            {
+                Face face;
+                std::vector<std::string> numbers;
+                numbers.reserve(10);
 
-				for (int i = 1; i <= 3; i++)
-				{
-					numbers.clear();
-					VertexGroup vertexGroup;
-					Utility::ParseString(subStrings[i], numbers, '/');
+                // Parse all vertex groups in the face line
+                for (size_t i = 1; i < subStrings.size(); i++)
+                {
+                    numbers.clear();
+                    VertexGroup vertexGroup;
+                    Utility::ParseString(subStrings[i], numbers, '/');
 
-					vertexGroup.v = std::stoi(numbers[0]) - 1;
-					vertexGroup.t = std::stoi(numbers[1]) - 1;
-					vertexGroup.n = std::stoi(numbers[2]) - 1;
+                    // Ensure the vertex group has all three components (v/vt/vn)
+                    if (numbers.size() == 3)
+                    {
+                        vertexGroup.v = std::stoi(numbers[0]) - 1;
+                        vertexGroup.t = std::stoi(numbers[1]) - 1;
+                        vertexGroup.n = std::stoi(numbers[2]) - 1;
+                        face.push_back(vertexGroup);
+                    }
+                }
 
-					face.push_back(vertexGroup);
-				}
+                // Only add faces with at least 3 vertices
+                if (face.size() >= 3)
+                {
+                    faces.push_back(face);
+                }
+                continue;
+            }
 
-				faces.push_back(face);
-				continue;
-			}
+            // Material group
+            if (subStrings[0] == "usemtl")
+            {
+                if (!m_materials.empty())
+                {
+                    for (const auto& material : m_materials)
+                    {
+                        if (material.GetName() == subStrings[1])
+                        {
+                            // If material changes and there are faces, create a new mesh
+                            if (!faces.empty() && currentMaterialName != subStrings[1])
+                            {
+                                Mesh mesh;
+                                mesh.name = lastName;
+                                mesh.materialName = currentMaterialName;
+                                SortVertexData(mesh, rawMesh, faces);
+                                m_meshes.push_back(mesh);
+                                faces.clear();
+                            }
+                            currentMaterialName = subStrings[1];
+                            lastMaterialName = subStrings[1];
+                            break;
+                        }
+                    }
+                }
+                continue;
+            }
 
-			//Material group
-			if (subStrings[0] == "usemtl")
-			{
-				if (!m_materials.empty())
-				{
-					for (const auto& material : m_materials)
-					{
-						if (material.GetName() == subStrings[1])
-						{
-							lastMaterialName = subStrings[1];
-							break;
-						}
-					}
-				}
+            // Material file
+            if (subStrings[0] == "mtllib")
+            {
+                Material material;
+                material.Load(subStrings[1], m_materials);
+                continue;
+            }
 
-				continue;
-			}
+            // Group data
+            if (subStrings[0] == "g" || subStrings[0] == "o")
+            {
+                if (!faces.empty())
+                {
+                    Mesh mesh;
+                    mesh.name = lastName;
+                    mesh.materialName = currentMaterialName;
+                    SortVertexData(mesh, rawMesh, faces);
+                    m_meshes.push_back(mesh);
+                    faces.clear();
+                }
+                lastName = subStrings[1];
+                continue;
+            }
+        }
+    }
 
-			//Material file
-			if (subStrings[0] == "mtllib")
-			{
-				Material material;
-				material.Load(subStrings[1], m_materials);
-				continue;
-			}
+    file.close();
 
-			//Group data
-			if (subStrings[0] == "g" || subStrings[0] == "o")
-			{
-				if (!faces.empty())
-				{
-					Mesh mesh;
-					mesh.name = lastName;
-					mesh.materialName = lastMaterialName;
-					SortVertexData(mesh, rawMesh, faces);
-					m_meshes.push_back(mesh);
-				}
+    if (!faces.empty())
+    {
+        Mesh mesh;
+        mesh.name = lastName;
+        mesh.materialName = currentMaterialName;
+        SortVertexData(mesh, rawMesh, faces);
+        m_meshes.push_back(mesh);
+    }
 
-				lastName = subStrings[1];
-				faces.clear();
-				continue;
-			}
-		}
-	}
-
-	file.close();
-
-	if (!faces.empty())
-	{
-		Mesh mesh;
-		mesh.name = lastName;
-		mesh.materialName = lastMaterialName;
-		SortVertexData(mesh, rawMesh, faces);
-		m_meshes.push_back(mesh);
-	}
-
-	FillBuffers();
+    FillBuffers();
 }
 
 void Model::SetColor(const glm::vec4& color)
@@ -183,8 +202,11 @@ void Model::Render(const Shader& shader)
 
 		for (auto mat : m_materials)
 		{
+			//Utility::AddMessage("Number of materials: " + std::to_string(m_materials.size()));
+			//Utility::AddMessage("Material name: " + mat.GetName());
 			if (mat.GetName() == m_meshes[count].materialName)
 			{
+				
 				mat.SendToShader(shader);
 
 				if (mat.IsTextured())
@@ -219,7 +241,7 @@ void Model::FillBuffers()
 		buffer.CreateBuffer(mesh.indices.size(), true);
 
 		buffer.FillEBO(&mesh.indices[0], mesh.indices.size() * sizeof(GLuint), Buffer::FillType::Once);
-		
+
 		buffer.FillVBO(Buffer::VBOType::VertexBuffer,
 			&mesh.vertices[0].x, mesh.vertices.size() * sizeof(glm::vec3), Buffer::FillType::Once);
 
@@ -249,24 +271,52 @@ void Model::SortVertexData(Mesh& newMesh, const Mesh& oldMesh, const std::vector
 
 	for (const auto& face : faces)
 	{
-		for (auto i = 0; i < 3; i++)
+		// Skip invalid faces
+		if (face.size() < 3) continue;
+
+		// If the face has 3 vertices, process it as a single triangle
+		if (face.size() == 3)
 		{
-			auto it = map.find(face[i]);
-
-			if (it == map.end())
+			for (size_t i = 0; i < 3; i++)
 			{
-				newMesh.vertices.push_back(oldMesh.vertices[face[i].v]);
-				newMesh.textureCoords.push_back(oldMesh.textureCoords[face[i].t]);
-				newMesh.normals.push_back(oldMesh.normals[face[i].n]);
-				newMesh.indices.push_back(count);
-
-				map[face[i]] = count;
-				count++;
+				auto it = map.find(face[i]);
+				if (it == map.end())
+				{
+					newMesh.vertices.push_back(oldMesh.vertices[face[i].v]);
+					newMesh.textureCoords.push_back(oldMesh.textureCoords[face[i].t]);
+					newMesh.normals.push_back(oldMesh.normals[face[i].n]);
+					newMesh.indices.push_back(count);
+					map[face[i]] = count++;
+				}
+				else
+				{
+					newMesh.indices.push_back(it->second);
+				}
 			}
-
-			else
+		}
+		// If the face has more than 3 vertices, triangulate using a fan approach
+		else
+		{
+			for (size_t i = 1; i < face.size() - 1; i++)
 			{
-				newMesh.indices.push_back(it->second);
+				// Form a triangle with face[0], face[i], face[i+1]
+				std::array<VertexGroup, 3> triangle = { face[0], face[i], face[i + 1] };
+				for (const auto& vg : triangle)
+				{
+					auto it = map.find(vg);
+					if (it == map.end())
+					{
+						newMesh.vertices.push_back(oldMesh.vertices[vg.v]);
+						newMesh.textureCoords.push_back(oldMesh.textureCoords[vg.t]);
+						newMesh.normals.push_back(oldMesh.normals[vg.n]);
+						newMesh.indices.push_back(count);
+						map[vg] = count++;
+					}
+					else
+					{
+						newMesh.indices.push_back(it->second);
+					}
+				}
 			}
 		}
 	}

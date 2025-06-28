@@ -50,9 +50,9 @@ public:
 
 	Model(const std::string& filename, Grid* parentGrid = nullptr);
 
+	void Update() override {}
 	void Render(const Shader& shader) override;
 	void SetColor(const glm::vec4& color) override;
-
 
 private:
 

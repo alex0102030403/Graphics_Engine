@@ -26,6 +26,11 @@ public:
 	void Update() {}
 	void Render(const Shader& shader);
 	void SendToShader(const Shader& shader);
+
+	void SetAmbient(const glm::vec3& ambient);
+	void SetDiffuse(const glm::vec3& diffuse);
+	void SetSpecular(const glm::vec3& specular);
+	void SetPosition(const glm::vec3& position);
 	
 private:
 

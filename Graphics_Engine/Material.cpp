@@ -93,6 +93,7 @@ bool Material::Load(const std::string& filename, std::vector<Material>& material
 			//New material group
 			if (subStrings[0] == "newmtl")
 			{
+
 				materials.push_back(Material());
 				materials.back().m_name = subStrings[1];
 				continue;
