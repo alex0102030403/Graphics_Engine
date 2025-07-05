@@ -2,6 +2,7 @@
 #include <vector>
 #include "Contact.h"
 #include "BoxCollider.h"
+#include <glm.hpp>  // Ensure GLM is included for vector operations
 
 class CollisionDetector {
 public:
@@ -9,16 +10,17 @@ public:
         std::vector<Contact> contacts;
         for (size_t i = 0; i < bodies.size(); ++i) {
             for (size_t j = i + 1; j < bodies.size(); ++j) {
-                //check if is trigger
+                // Check if is trigger
                 RigidBody* bodyA = bodies[i];
                 RigidBody* bodyB = bodies[j];
                 BoxCollider* colliderA = dynamic_cast<BoxCollider*>(bodyA->collider);
                 BoxCollider* colliderB = dynamic_cast<BoxCollider*>(bodyB->collider);
                 if (!colliderA || !colliderB) continue;
-                if (checkAABBOverlap(bodyA, colliderA, bodyB, colliderB)) {
+                // Use sphere overlap check for broad phase
+                if (checkSphereOverlap(bodyA, colliderA, bodyB, colliderB)) {
                     Contact contact;
                     if (detectOBBCollision(bodyA, colliderA, bodyB, colliderB, contact)) {
-						//Add feature for checking name_A - name_B collisions
+                        // Add feature for checking name_A - name_B collisions
                         contacts.push_back(contact);
                     }
                 }
@@ -39,6 +41,16 @@ private:
         return overlap;
     }
 
+    bool checkSphereOverlap(RigidBody* bodyA, BoxCollider* colliderA, RigidBody* bodyB, BoxCollider* colliderB) {
+        glm::vec3 C_A = bodyA->position;
+        glm::vec3 C_B = bodyB->position;
+        glm::vec3 delta = C_B - C_A;
+        float dist_squared = glm::dot(delta, delta);
+        float R_A = glm::length(colliderA->halfExtents);
+        float R_B = glm::length(colliderB->halfExtents);
+        float R_sum = R_A + R_B;
+        return dist_squared <= R_sum * R_sum;
+    }
 
     bool detectOBBCollision(RigidBody* bodyA, BoxCollider* colliderA, RigidBody* bodyB, BoxCollider* colliderB, Contact& contact) {
         const float EPSILON = 1e-5f;
@@ -65,10 +77,7 @@ private:
         float minOverlap = std::numeric_limits<float>::max();
         glm::vec3 minAxis;
 
-
         // Debug output for ground collisions
-        
-
 
         // Test all axes
         for (const auto& axis : axes) {
@@ -85,8 +94,6 @@ private:
                 minAxis = axis;
             }
         }
-
-           
 
         // Collision detected, set contact data
         contact.contactNormal = (glm::dot(T, minAxis) > 0) ? minAxis : -minAxis;

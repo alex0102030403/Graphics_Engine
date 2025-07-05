@@ -8,5 +8,7 @@ out float lifetime;
 
 void main() {
     worldPos = position;
-    lifetime = lifetimeVec.x; // Normalized lifetime is in the x component
+    lifetime = lifetimeVec.x;
 }
+
+

@@ -24,7 +24,6 @@ private:
     glm::vec3 velocity = glm::vec3(0.0f);
     float mass = 1.0f;
     bool isStatic = false;
-    float restitution = 0.5f;
     Buffer m_buffer;
     Buffer m_edgeBuffer;
     Texture m_texture;
@@ -54,7 +53,5 @@ public:
     void SetMass(float m) { mass = m > 0 ? m : 1.0f; }
     bool IsStatic() const { return isStatic; }
     void SetStatic(bool s) { isStatic = s; }
-    float GetRestitution() const { return restitution; }
-    void SetRestitution(float r) { restitution = glm::clamp(r, 0.0f, 1.0f); }
 
 };

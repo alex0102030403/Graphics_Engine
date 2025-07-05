@@ -28,11 +28,11 @@ public:
 
 private:
     struct Particle {
-        glm::vec3 position;      // Current position of the particle
-        glm::vec3 velocity;      // Velocity of the particle
-        float lifetime;          // Remaining lifetime in seconds
-        float initialLifetime;   // Initial lifetime for normalization
-        bool active;             // Whether the particle is active
+        glm::vec3 position;      
+        glm::vec3 velocity;      
+        float lifetime;          
+        float initialLifetime;   
+        bool active;             
     };
 
     std::vector<Particle> m_particles; // Collection of particles

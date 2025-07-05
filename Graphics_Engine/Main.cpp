@@ -64,8 +64,11 @@ void setupDemo(PhysicsWorld& world, Grid* grid) {
     objects.back()->SetColor(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)); // Base color, overridden by texture
 
     int cubeCounter = 0;
-    for (int i = 0; i < 9; ++i) { // 9 layers
-        int size = 9 - i;         // Size of the current layer (9 down to 1)
+
+	int numberOfLayers = 14
+        ; // Number of layers for the pyramid structure
+    for (int i = 0; i < numberOfLayers; ++i) { // 9 layers
+        int size = numberOfLayers - i;         // Size of the current layer (9 down to 1)
         for (int ix = 0; ix < size; ++ix) {
             for (int iz = 0; iz < size; ++iz) {
                 RigidBody* cube = new RigidBody();
@@ -79,6 +82,7 @@ void setupDemo(PhysicsWorld& world, Grid* grid) {
                 float I = (1.0f / 6.0f) * 10.0f * cubeSize * cubeSize;
                 cube->setInertiaTensor(glm::mat3(I, 0, 0, 0, I, 0, 0, 0, I));
                 cube->collider = new BoxCollider(glm::vec3(0.5f, 0.5f, 0.5f));
+
                 cube->collider->name = "box";
                 cube->name = "DynamicCube" + std::to_string(cubeCounter++);
                 world.addBody(cube);
@@ -291,11 +295,21 @@ int main(int argc, char* argv[]) {
     Uint32 previousTime = SDL_GetTicks();
 
 	bool isGameRunning = true; // Track cursor focus state
-
+	int fps = 0;
+	int averageFps = 0;
+    
     while (isAppRunning) {
+
         Uint32 currentTime = SDL_GetTicks();
         float deltaTime = (currentTime - previousTime) / 1000.0f;
         previousTime = currentTime;
+		fps = static_cast<int>(1.0f / deltaTime);
+        
+		averageFps = (averageFps + fps) / 2; // Simple average for FPS
+
+		Utility::AddMessage("FPS: " + std::to_string(fps) + " | Average FPS: " + std::to_string(averageFps));
+
+
 
         Screen::Instance()->ClearScreen();
         Input::Instance()->Update();

@@ -7,7 +7,7 @@
 
 Cube::Cube(const std::string& textureFilename, Grid* parentGrid)
     : m_isTextured(false), m_parentGrid(parentGrid), m_transform(), m_color(glm::vec4(1.0f)),
-    velocity(glm::vec3(0.0f)), mass(1.0f), isStatic(false), restitution(0.5f), m_edgesInitialized(false)
+    velocity(glm::vec3(0.0f)), mass(1.0f), isStatic(false), m_edgesInitialized(false)
 {
     m_transform.SetIdentity();
     GLfloat vertices[] = { -0.5f,  0.5f,  0.5f,
